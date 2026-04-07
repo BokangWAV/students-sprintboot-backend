@@ -15,6 +15,7 @@ public class Student {
     private String secondName;
     private int score;
 
+    //default constructor required
     public Student() {}
 
     public Student(String firstName, String secondName, int score) {

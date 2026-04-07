@@ -2,6 +2,7 @@ package com.example.topgradesapp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.topgradesapp.model.Student;
 import org.springframework.web.multipart.MultipartFile;
@@ -80,6 +81,17 @@ public class TopgradesappApplication {
 		}
 	}
 
+	@GetMapping("/fetchStudent")
+	public List<Student> getStudent(@RequestParam("firstname") String firstName, @RequestParam ("secondname") String secondName) {
+		try {
+			List<Student> student = studentService.getStudent(firstName, secondName);
+			return student;
+		}
+		catch (Exception e) {
+			throw new RuntimeException("Failed to fetch student from database: " + e.getMessage());
+		}
+	}
+
     @GetMapping("/fetchAllStudents") 
 	public List<Student> getAllStudents() {
 
@@ -88,9 +100,11 @@ public class TopgradesappApplication {
 			return allStudents;
 		}
 		catch (Exception e) {
-			throw new RuntimeException("Failed to fetch data from database: " + e.getMessage());
+			throw new RuntimeException("Failed to fetch all students from database: " + e.getMessage());
 		}
 	}
+
+
 
 	@GetMapping("/fetchTopStudents")
 	public List<Student> getTopStudents() {
@@ -101,5 +115,32 @@ public class TopgradesappApplication {
 		catch(Exception e) {
 			throw new RuntimeException("Failed to fetch top students from database: " + e.getMessage());
 		}
+	}
+
+	@DeleteMapping("/deleteStudent") 
+	public ResponseEntity<String> deleteStudent(@RequestParam("firstname") String firstName, @RequestParam("secondname") String secondName) {
+		List<Student> student = studentService.getStudent(firstName, secondName);
+		if(student.isEmpty()) {
+			return ResponseEntity.status(404).body("Student not found");
+		}
+		try {
+			studentService.deleteStudent(firstName, secondName);
+			return ResponseEntity.ok("Deleted");
+		}
+		catch (Exception e) {
+			throw new RuntimeException("Failed to delete student from database: " + e.getMessage());
+		}
+	}
+
+	@PutMapping("/updateScore")
+	public ResponseEntity<String> updateStudentScore(@RequestParam("firstname") String firstName, @RequestParam("secondname") String secondName, @RequestParam("score") int score) {
+
+		int updated = studentService.updateStudentScore(firstName, secondName, score);
+
+		if(updated == 0) {
+			return ResponseEntity.status(404).body("Student not found");
+		}
+
+		return ResponseEntity.ok("Updated " + updated + " student(s)");
 	}
 }

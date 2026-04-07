@@ -4,8 +4,12 @@ import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.example.topgradesapp.model.Student;
 import com.example.topgradesapp.repository.StudentRepository;
+
+// * Transactional used for: DELETE  & UPDATE
 
 @Service
 public class StudentService {
@@ -13,6 +17,14 @@ public class StudentService {
     @Autowired
     private StudentRepository studentRepository;
 
+    @Transactional
+    public void deleteStudent(String firstName, String secondName) {
+        studentRepository.deleteByFirstNameAndSecondName(firstName, secondName);
+    }
+
+    public int updateStudentScore(String firstName, String secondName, int score) {
+        return studentRepository.updateScore(firstName, secondName, score);
+    }
 
     public Student saveStudent(Student student) {
         return studentRepository.save(student);
@@ -20,6 +32,10 @@ public class StudentService {
 
     public List<Student> saveStudents(List<Student> students) {
         return studentRepository.saveAll(students);
+    }
+
+    public List<Student> getStudent(String firstName, String secondName) {
+        return studentRepository.findByFirstNameAndSecondName(firstName, secondName);
     }
 
     public List<Student> getAllStudents() {
